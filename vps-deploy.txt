@@ -1,0 +1,45 @@
+
+Mon Aug  3 00:32:36 PDT 2015
+Script for deploying a new VPS
+------------------------------
+
+yum install epel-release
+yum install etckeeper
+etckeeper init
+etckeeper commit "initial commit"
+etckeeper update
+etckeeper commit "updated packages"
+yum install https://github.com/dannys42/pmfw/releases/download/0.21/pmfw-0.21-1.noarch.rpm https://github.com/dannys42/pmfw/releases/download/0.21/pmfw-webknock-server-0.21-1.noarch.rpm
+etckeeper commit "Install PMFW and dependencies"
+#echo "99.42.137.100" >> /etc/pmfw/hosts.allow
+echo "allow_cron=1" >> /etc/pmfw/pmfw.conf
+echo "allow_http=1" >> /etc/pmfw/pmfw.conf
+pmfw-deploy 
+
+# Ensure pmfw is enabled on startup
+echo "#!/bin/sh" >> /sbin/ifup-local
+echo "/sbin/pmfw-deploy --cron" >> /sbin/ifup-local
+chmod a+rx /sbin/ifup-local
+
+chkconfig httpd on
+service httpd start
+
+touch /var/www/html/index.html
+mkdir /var/www/html/<SECRET_PATH>
+cp /var/lib/pmfw/default-webknock.php/webknock.php /var/www/html/<SECRET_PATH>/index.php
+
+# Remove requiretty from sudoers
+visudo 
+etckeeper commit "Disable requiretty from sudoers"
+
+# Set PasswordAuthentication no
+vi /etc/ssh/sshd_config
+etckeeper commit "Disable password logins"
+yum install vim-enhanced
+etckeeper commit "Installed vim-enhanced"
+
+# Install AWS client
+yum install python-pip
+pip install awscli
+etckeeper commit "Installed AWS CLI"
+

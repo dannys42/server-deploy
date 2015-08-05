@@ -1,0 +1,41 @@
+" Danny's custom vim settings
+
+if has("syntax")
+   syntax on
+endif
+
+set autoindent
+set expandtab
+set nobackup
+set ruler
+set shiftwidth=4
+set showmatch
+set tabstop=4
+set textwidth=70
+set writebackup   " Make a backup before overwriting a file.
+                  " The backup is removed after the file was successfully
+                  " written, unless the 'backup' option is also on.
+set background=dark
+
+if has("autocmd")
+   augroup C
+      "au FileType c set fo=croq
+      au FileType c set expandtab cindent
+
+      if version >= 600
+         au FileType c set foldenable foldmethod=syntax
+         au FileType c set foldlevel=9999 " default to expand all folds
+         au FileType c syn region Block start="{" end="}" transparent fold
+         au FileType c syn region Comment start="/\*" end="\*/" fold
+      endif
+   augroup END
+
+   au BufRead  [Mm]akefile*,Imakefile*,[Mm]ake.* set noexpandtab
+   au BufEnter [Mm]akefile*,Imakefile*,[Mm]ake.* set noexpandtab
+   au BufLeave [Mm]akefile*,Imakefile*,[Mm]ake.* set expandtab
+endif
+
+set cpoptions=ces$
+
+" C specific options
+set cinoptions=>4,e0,n0,f0,{0,}0,^0,:s,=s,ps,ts,+8,(4,)20,*30
